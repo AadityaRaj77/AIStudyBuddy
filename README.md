@@ -1,1 +1,1 @@
-# AIStudyBuddy
+# NeuroMap
