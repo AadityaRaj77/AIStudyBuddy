@@ -7,6 +7,7 @@ import analyzeRoute from "./routes/analyzeNote.js"
 import quizRoute from "./routes/generateQuiz.js"
 import planRoute from "./routes/revisionPlan.js"
 import graphRoute from "./routes/conceptGraph.js"
+import studyRoute from "./routes/studySession.js"
 
 const app = express()
 
@@ -17,6 +18,7 @@ app.use("/api/analyze", analyzeRoute)
 app.use("/api/quiz", quizRoute)
 app.use("/api/plan", planRoute)
 app.use("/api/graph", graphRoute)
+app.use("/api/study-session", studyRoute)
 
 const PORT = process.env.PORT || 5000
 

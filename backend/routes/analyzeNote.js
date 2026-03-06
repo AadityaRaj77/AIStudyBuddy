@@ -21,11 +21,6 @@ router.post("/", upload.single("note"), async (req, res) => {
 
         const aiResult = await analyzeNote(imageUrl)
 
-        res.json({
-            imageUrl,
-            analysis: aiResult
-        })
-
         const graph = buildConceptGraph(aiResult)
 
         res.json({

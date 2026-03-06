@@ -7,9 +7,9 @@ router.post("/", async (req, res) => {
     const { weakConcepts } = req.body
 
     const plan = [
-        "Review Maxwell Equations",
-        "Practice problems on Wave Equation",
-        "Revise Electromagnetic wave propagation"
+        "Day 1: Review Maxwell Equations and Faraday Law",
+        "Day 2: Practice Wave Equation derivations",
+        "Day 3: Revise Electromagnetic wave propagation"
     ]
 
     res.json({

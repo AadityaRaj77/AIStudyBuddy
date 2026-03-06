@@ -10,7 +10,7 @@ export function buildConceptGraph(analysis) {
         nodes.push({
             id: topic,
             data: { label: topic },
-            position: { x: 100 * index, y: 100 }
+            position: { x: index * 200, y: 100 }
         })
     })
 

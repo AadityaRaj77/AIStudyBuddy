@@ -4,10 +4,12 @@ const router = express.Router()
 
 router.post("/", async (req, res) => {
 
+    const { topics } = req.body
+
     const quiz = {
         questions: [
             {
-                question: "Which equation predicts electromagnetic waves?",
+                question: `Which concept leads to the Wave Equation?`,
                 options: [
                     "Maxwell Equations",
                     "Ohm Law",
@@ -17,19 +19,22 @@ router.post("/", async (req, res) => {
                 correct_answer: "Maxwell Equations"
             },
             {
-                question: "What does Faraday's law describe?",
+                question: `What does the wave equation describe?`,
                 options: [
-                    "Magnetic field induced by electric current",
-                    "Electric field induced by changing magnetic field",
+                    "Propagation of electromagnetic waves",
                     "Gravity",
-                    "Thermodynamics"
+                    "Thermodynamics",
+                    "Fluid motion"
                 ],
-                correct_answer: "Electric field induced by changing magnetic field"
+                correct_answer: "Propagation of electromagnetic waves"
             }
         ]
     }
 
-    res.json(quiz)
+    res.json({
+        topics,
+        quiz
+    })
 
 })
 
