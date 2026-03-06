@@ -5,6 +5,7 @@ import type { ConceptGraph } from "../types";
 
 interface Props {
   graph: ConceptGraph | null;
+  setSelectedConcept: (concept: string) => void;
 }
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -41,7 +42,7 @@ function layoutGraph(graph: ConceptGraph) {
   };
 }
 
-export default function ConceptGraph({ graph }: Props) {
+export default function ConceptGraph({ graph, setSelectedConcept }: Props) {
   if (!graph) return null;
 
   const layouted = layoutGraph(graph);
@@ -58,7 +59,14 @@ export default function ConceptGraph({ graph }: Props) {
   "
     >
       <div className="h-125">
-        <ReactFlow nodes={layouted.nodes} edges={layouted.edges} fitView />
+        <ReactFlow
+          nodes={layouted.nodes}
+          edges={layouted.edges}
+          fitView
+          onNodeClick={(_, node) => {
+            setSelectedConcept(node.data.label);
+          }}
+        />
       </div>
     </div>
   );

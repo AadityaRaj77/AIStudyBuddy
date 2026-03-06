@@ -1,10 +1,12 @@
 import { useState } from "react";
 import UploadPage from "./pages/UploadPage";
 import ConceptGraph from "./components/ConceptGraph";
+import ConceptPanel from "./components/ConceptPanel";
 import type { ConceptGraph as GraphType } from "./types";
 
 function App() {
   const [graph, setGraph] = useState<GraphType | null>(null);
+  const [selectedConcept, setSelectedConcept] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-10">
@@ -27,8 +29,8 @@ function App() {
 
       <div className="max-w-5xl mx-auto space-y-6">
         <UploadPage setGraph={setGraph} />
-
-        <ConceptGraph graph={graph} />
+        <ConceptPanel concept={selectedConcept} />
+        <ConceptGraph graph={graph} setSelectedConcept={setSelectedConcept} />
       </div>
     </div>
   );
