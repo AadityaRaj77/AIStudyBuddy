@@ -9,6 +9,7 @@ import planRoute from "./routes/revisionPlan.js"
 import graphRoute from "./routes/conceptGraph.js"
 import studyRoute from "./routes/studySession.js"
 import explainConcept from "./routes/explainConcept.js";
+import roadmapRoute from "./routes/revisionRoadmap.js"
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use("/api/plan", planRoute)
 app.use("/api/graph", graphRoute)
 app.use("/api/study-session", studyRoute)
 app.use("/api/explain", explainConcept);
+app.use("/api/roadmap", roadmapRoute)
 
 const PORT = process.env.PORT || 5000
 

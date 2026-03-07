@@ -3,10 +3,17 @@ import axios from "axios";
 
 interface Props {
   concept: string | null;
+  setWeakConcepts: React.Dispatch<React.SetStateAction<string[]>>;
+  setStrongConcepts: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function ConceptPanel({ concept }: Props) {
+export default function ConceptPanel({
+  concept,
+  setWeakConcepts,
+  setStrongConcepts,
+}: Props) {
   const [data, setData] = useState<any>(null);
+  const [selected, setSelected] = useState<number | null>(null);
 
   useEffect(() => {
     if (!concept) return;
@@ -35,16 +42,44 @@ export default function ConceptPanel({ concept }: Props) {
 
           <div className="space-y-3">
             {data.quiz.map((q: any, i: number) => (
-              <div key={i} className="text-sm">
-                <p className="font-semibold">{q.question}</p>
-                <ul className="list-disc ml-4 text-slate-400">
-                  {q.options.map((o: string) => (
-                    <li key={o}>{o}</li>
-                  ))}
-                </ul>
+              <div key={i} className="text-sm mb-4">
+                <p className="font-semibold mb-2">{q.question}</p>
+
+                {q.options.map((o: string) => (
+                  <button
+                    key={o}
+                    onClick={() => {
+                      if (o === q.answer) {
+                        setStrongConcepts((prev) => [...prev, concept!]);
+                      } else {
+                        setWeakConcepts((prev) => [...prev, concept!]);
+                      }
+                      setSelected(i);
+                    }}
+                    className="
+                      block
+                      w-full
+                      text-left
+                      p-2
+                      mb-1
+                      rounded
+                      border
+                      border-slate-700
+                      hover:bg-slate-800
+                    "
+                  >
+                    {o}
+                  </button>
+                ))}
               </div>
             ))}
           </div>
+
+          {selected !== null && (
+            <div className="mt-4 text-sm text-neonGreen">
+              Good attempt. Review this concept again if unsure.
+            </div>
+          )}
         </>
       )}
     </div>
