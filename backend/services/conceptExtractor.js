@@ -2,6 +2,7 @@ import { callLLM } from "./llmClient.js";
 
 export async function extractConcepts(noteText) {
 
+    const truncated = noteText.slice(0, 4000);
     const prompt = `
 You are extracting a knowledge graph from study notes.
 
@@ -28,7 +29,7 @@ Guidelines:
 - Relationships must connect existing concepts
 
 Study notes:
-${noteText}
+${truncated}
 `;
 
     const res = await callLLM(prompt);
