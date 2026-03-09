@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Note {
+  id        Int       @id @default(autoincrement())
+  title     String?
+  content   String?
+  createdAt DateTime  @default(now())
+
+  concepts  Concept[]
+}
+
+model Concept {
+  id        Int      @id @default(autoincrement())
+  name      String
+  noteId    Int
+  strength  Int      @default(0)
+
+  note      Note     @relation(fields: [noteId], references: [id])
+  relationsFrom Relationship[] @relation("fromConcept")
+  relationsTo   Relationship[] @relation("toConcept")
+}
+
+model Relationship {
+  id      Int    @id @default(autoincrement())
+  type    String
+
+  fromId  Int
+  toId    Int
+
+  from    Concept @relation("fromConcept", fields: [fromId], references: [id])
+  to      Concept @relation("toConcept", fields: [toId], references: [id])
+}
+
+model QuizResult {
+  id        Int      @id @default(autoincrement())
+  conceptId Int
+  correct   Boolean
+  createdAt DateTime @default(now())
+}

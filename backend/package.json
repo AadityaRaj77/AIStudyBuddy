@@ -13,12 +13,17 @@
   "type": "module",
   "dependencies": {
     "@azure/storage-blob": "^12.31.0",
+    "@prisma/client": "^7.4.2",
     "axios": "^1.13.6",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14",
-    "openai": "^6.25.0"
+    "openai": "^6.25.0",
+    "prisma": "^7.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5"
   }
 }
