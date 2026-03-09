@@ -3,9 +3,10 @@ import { analyzeNote } from "../api/api";
 
 interface Props {
   setGraph: (graph: any) => void;
+  setNoteId: (id: number) => void;
 }
 
-export default function UploadPage({ setGraph }: Props) {
+export default function UploadPage({ setGraph, setNoteId }: Props) {
   const [file, setFile] = useState<File | null>(null);
 
   const handleUpload = async () => {
@@ -14,6 +15,7 @@ export default function UploadPage({ setGraph }: Props) {
     const data = await analyzeNote(file);
 
     setGraph(data.graph);
+    setNoteId(Number(data.noteId));
   };
 
   return (

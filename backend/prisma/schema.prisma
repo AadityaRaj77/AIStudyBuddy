@@ -31,6 +31,10 @@ model Concept {
   note      Note     @relation(fields: [noteId], references: [id])
   relationsFrom Relationship[] @relation("fromConcept")
   relationsTo   Relationship[] @relation("toConcept")
+  
+  lastReviewed DateTime?
+  nextReview   DateTime?
+  interval     Int      @default(1)
 }
 
 model Relationship {

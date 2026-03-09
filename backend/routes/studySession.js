@@ -1,41 +1,28 @@
 import express from "express"
-import { analyzeNote } from "../services/openaiService.js"
-import { buildConceptGraph } from "../utils/graphBuilder.js"
+import { prisma } from "../db/prisma.js"
 
 const router = express.Router()
 
-router.post("/", async (req, res) => {
+router.get("/:noteId", async (req, res) => {
 
-    const mockAnalysis = await analyzeNote()
+    const noteId = Number(req.params.noteId)
 
-    const graph = buildConceptGraph(mockAnalysis)
+    const concepts = await prisma.concept.findMany({
+        where: { noteId },
+        orderBy: {
+            strength: "asc"
+        }
+    })
 
-    const quiz = {
-        questions: [
-            {
-                question: "Which equations produce the wave equation?",
-                options: [
-                    "Maxwell Equations",
-                    "Newton Laws",
-                    "Ohm Law",
-                    "Gauss Law"
-                ],
-                correct_answer: "Maxwell Equations"
-            }
-        ]
+    if (concepts.length === 0) {
+        return res.json({ message: "No concepts found" })
     }
 
-    const revisionPlan = [
-        "Revise Maxwell Equations",
-        "Practice wave equation derivations",
-        "Review EM wave propagation"
-    ]
+    const nextConcept = concepts[0]
 
     res.json({
-        analysis: mockAnalysis,
-        graph,
-        quiz,
-        revisionPlan
+        nextConcept: nextConcept.name,
+        strength: nextConcept.strength
     })
 
 })

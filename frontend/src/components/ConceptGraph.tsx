@@ -8,6 +8,7 @@ interface Props {
   setSelectedConcept: (concept: string) => void;
   weakConcepts: string[];
   strongConcepts: string[];
+  currentStudyConcept: string | null;
 }
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -20,6 +21,7 @@ function layoutGraph(
   graph: ConceptGraph,
   weakConcepts: string[],
   strongConcepts: string[],
+  currentStudyConcept: string | null,
 ) {
   dagreGraph.setGraph({ rankdir: "LR" });
 
@@ -38,6 +40,7 @@ function layoutGraph(
 
     const isWeak = weakConcepts.includes(node.id);
     const isStrong = strongConcepts.includes(node.id);
+    const isCurrent = node.id === currentStudyConcept;
 
     let border = "1px solid #00f5ff";
     let glow = "0 0 10px #00f5ff";
@@ -50,6 +53,12 @@ function layoutGraph(
     if (isStrong) {
       border = "2px solid #22c55e";
       glow = "0 0 15px #22c55e";
+    }
+
+    // Highlight current study concept (purple)
+    if (isCurrent) {
+      border = "2px solid #a855f7";
+      glow = "0 0 20px #a855f7";
     }
 
     return {
@@ -78,10 +87,16 @@ export default function ConceptGraph({
   setSelectedConcept,
   weakConcepts,
   strongConcepts,
+  currentStudyConcept,
 }: Props) {
   if (!graph) return null;
 
-  const layouted = layoutGraph(graph, weakConcepts, strongConcepts);
+  const layouted = layoutGraph(
+    graph,
+    weakConcepts,
+    strongConcepts,
+    currentStudyConcept,
+  );
 
   return (
     <div className="rounded-xl border border-slate-700 bg-slate-900 p-4 shadow-lg">

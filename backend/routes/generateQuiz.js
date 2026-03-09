@@ -4,14 +4,13 @@ import { getRelevantChunks } from "../services/retrieval.js"
 
 const router = express.Router()
 
-//Generate explanation + quiz for a concept
+// Generate explanation + quiz
 router.post("/", async (req, res) => {
 
     try {
 
         const { concept, noteId } = req.body
 
-        // retrieve relevant note chunks
         const contextChunks = await getRelevantChunks(noteId, concept)
 
         const explanation = `
@@ -21,7 +20,8 @@ Relevant parts from your notes:
 ${contextChunks.join("\n\n")}
 
 Explanation:
-This concept appears in your notes. Study how it connects to other nodes in the concept graph to understand the relationships.
+${concept} appears in your notes and connects to other concepts in the knowledge graph.
+Understanding these relationships helps reinforce the topic.
 `
 
         const quiz = [
@@ -51,9 +51,8 @@ This concept appears in your notes. Study how it connects to other nodes in the 
 
 })
 
-/*
-Save quiz result
-*/
+
+// Save quiz result + update learning schedule
 router.post("/result", async (req, res) => {
 
     try {
@@ -67,10 +66,19 @@ router.post("/result", async (req, res) => {
             }
         })
 
+        const concept = await prisma.concept.findUnique({
+            where: { id: conceptId }
+        })
+
+        let interval = correct ? (concept.interval || 1) * 2 : 1
+
         await prisma.concept.update({
             where: { id: conceptId },
             data: {
-                strength: correct ? { increment: 1 } : { decrement: 1 }
+                strength: correct ? { increment: 1 } : { decrement: 1 },
+                interval,
+                lastReviewed: new Date(),
+                nextReview: new Date(Date.now() + interval * 86400000)
             }
         })
 

@@ -15,7 +15,10 @@ router.get("/:noteId", async (req, res) => {
 
     const nodes = concepts.map((c, i) => ({
         id: c.name,
-        data: { label: c.name },
+        data: {
+            label: c.name,
+            strength: c.strength
+        },
         position: { x: i * 200, y: 100 }
     }))
 

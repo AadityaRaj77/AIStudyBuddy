@@ -10,6 +10,8 @@ import graphRoute from "./routes/conceptGraph.js"
 import studyRoute from "./routes/studySession.js"
 import explainConcept from "./routes/explainConcept.js";
 import roadmapRoute from "./routes/revisionRoadmap.js"
+import progressRoute from "./routes/progress.js"
+import gapRoute from "./routes/knowledgeGaps.js"
 
 const app = express()
 
@@ -23,6 +25,8 @@ app.use("/api/graph", graphRoute)
 app.use("/api/study-session", studyRoute)
 app.use("/api/explain", explainConcept);
 app.use("/api/roadmap", roadmapRoute)
+app.use("/api/progress", progressRoute)
+app.use("/api/gaps", gapRoute)
 
 const PORT = process.env.PORT || 5000
 

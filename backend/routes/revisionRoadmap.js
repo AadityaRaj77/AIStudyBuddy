@@ -7,19 +7,38 @@ router.get("/:noteId", async (req, res) => {
 
     const noteId = Number(req.params.noteId)
 
-    const weakConcepts = await prisma.concept.findMany({
-        where: {
-            noteId,
-            strength: { lt: 0 }
-        }
+    const concepts = await prisma.concept.findMany({
+        where: { noteId }
     })
 
-    const roadmap = weakConcepts.map((c, i) => ({
+    const relations = await prisma.relationship.findMany()
+
+    const roadmap = concepts.map(c => {
+
+        const connections =
+            relations.filter(
+                r => r.fromId === c.id || r.toId === c.id
+            ).length
+
+        const priority = connections - (c.strength || 0)
+
+        return {
+            concept: c.name,
+            strength: c.strength,
+            connections,
+            priority
+        }
+
+    })
+
+    roadmap.sort((a, b) => b.priority - a.priority)
+
+    const steps = roadmap.map((r, i) => ({
         step: i + 1,
-        concept: c.name
+        concept: r.concept
     }))
 
-    res.json({ roadmap })
+    res.json({ roadmap: steps })
 
 })
 
