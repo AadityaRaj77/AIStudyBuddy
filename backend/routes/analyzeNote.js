@@ -1,6 +1,7 @@
 import express from "express"
 import { prisma } from "../db/prisma.js"
 import { chunkText } from "../services/chunker.js"
+import { extractConcepts } from "../services/conceptExtractor.js";
 
 const router = express.Router()
 
@@ -16,17 +17,11 @@ router.post("/", async (req, res) => {
             }
         })
 
-        // mock concept extraction (later AI will generate this)
-        const topics = [
-            "Maxwell Equations",
-            "Wave Equation",
-            "Electromagnetic Waves"
-        ]
+        //concept extraction
+        const aiData = await extractConcepts(content);
 
-        const relations = [
-            { from: "Maxwell Equations", to: "Wave Equation", type: "derives" },
-            { from: "Wave Equation", to: "Electromagnetic Waves", type: "explains" }
-        ]
+        const topics = aiData.concepts;
+        const relations = aiData.relationships;
 
         // store concepts
         const conceptMap = {}

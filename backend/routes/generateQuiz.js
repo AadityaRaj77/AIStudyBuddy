@@ -1,6 +1,9 @@
 import express from "express"
 import { prisma } from "../db/prisma.js"
 import { getRelevantChunks } from "../services/retrieval.js"
+import { callLLM } from "../services/llmClient.js";
+import { generateExplanation } from "../services/explanationGenerator.js";
+import { generateQuiz } from "../services/quizGenerator.js";
 
 const router = express.Router()
 
@@ -13,29 +16,9 @@ router.post("/", async (req, res) => {
 
         const contextChunks = await getRelevantChunks(noteId, concept)
 
-        const explanation = `
-Concept: ${concept}
+        const explanation = await generateExplanation(concept, contextChunks);
 
-Relevant parts from your notes:
-${contextChunks.join("\n\n")}
-
-Explanation:
-${concept} appears in your notes and connects to other concepts in the knowledge graph.
-Understanding these relationships helps reinforce the topic.
-`
-
-        const quiz = [
-            {
-                question: `What concept is related to ${concept}?`,
-                options: [
-                    "Electromagnetic Waves",
-                    "Gravity",
-                    "Thermodynamics",
-                    "Optics"
-                ],
-                answer: "Electromagnetic Waves"
-            }
-        ]
+        const quiz = [await generateQuiz(concept)];
 
         res.json({
             explanation,
