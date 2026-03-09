@@ -6,20 +6,20 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Note {
-  id        Int       @id @default(autoincrement())
-  title     String?
+  id        Int      @id @default(autoincrement())
   content   String?
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   concepts  Concept[]
+  chunks    NoteChunk[]
 }
 
 model Concept {
@@ -49,4 +49,13 @@ model QuizResult {
   conceptId Int
   correct   Boolean
   createdAt DateTime @default(now())
+}
+
+model NoteChunk {
+  id        Int      @id @default(autoincrement())
+  noteId    Int
+  content   String
+  embedding Float[]  // store embedding vector as float array
+
+  note      Note     @relation(fields: [noteId], references: [id])
 }

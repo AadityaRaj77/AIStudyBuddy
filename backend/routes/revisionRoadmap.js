@@ -1,15 +1,22 @@
 import express from "express"
+import { prisma } from "../db/prisma.js"
 
 const router = express.Router()
 
-router.post("/", async (req, res) => {
+router.get("/:noteId", async (req, res) => {
 
-    const { weakConcepts } = req.body
+    const noteId = Number(req.params.noteId)
+
+    const weakConcepts = await prisma.concept.findMany({
+        where: {
+            noteId,
+            strength: { lt: 0 }
+        }
+    })
 
     const roadmap = weakConcepts.map((c, i) => ({
         step: i + 1,
-        concept: c,
-        action: "Review explanation and practice problems"
+        concept: c.name
     }))
 
     res.json({ roadmap })
