@@ -1,79 +1,104 @@
-import express from "express"
-import { prisma } from "../db/prisma.js"
-import { getRelevantChunks } from "../services/retrieval.js"
+import express from "express";
+import { prisma } from "../db/prisma.js";
+import { getRelevantChunks } from "../services/retrieval.js";
 import { callLLM } from "../services/llmClient.js";
-import { generateExplanation } from "../services/explanationGenerator.js";
-import { generateQuiz } from "../services/quizGenerator.js";
 
-const router = express.Router()
+const router = express.Router();
 
-// Generate explanation + quiz
 router.post("/", async (req, res) => {
-
     try {
 
-        const { concept, noteId } = req.body
+        const { concept, noteId } = req.body;
 
-        const contextChunks = await getRelevantChunks(noteId, concept)
+        if (!concept) {
+            return res.status(400).json({ error: "Concept missing" });
+        }
 
-        const explanation = await generateExplanation(concept, contextChunks);
+        let contextChunks = [];
 
-        const quiz = [await generateQuiz(concept)];
+        try {
+            if (noteId) {
+                contextChunks = await getRelevantChunks(noteId, concept);
+            }
+        } catch (err) {
+            console.log("Retrieval failed, continuing without context");
+        }
+
+        const context = contextChunks.join("\n\n");
+
+        const prompt = `
+Explain the concept "${concept}" in simple terms.
+
+Context from study notes:
+${context}
+
+Then create ONE quiz question.
+
+Return STRICT JSON format:
+
+{
+  "explanation": "",
+  "quiz":[
+    {
+      "question":"",
+      "options":["","","",""],
+      "answer":""
+    }
+  ]
+}
+`;
+
+        let parsed;
+
+        try {
+
+            const llmResponse = await callLLM(prompt);
+
+            const clean = llmResponse
+                .replace(/```json/g, "")
+                .replace(/```/g, "")
+                .trim();
+
+            parsed = JSON.parse(clean);
+
+        } catch (err) {
+
+            console.log("LLM parsing failed, using fallback");
+
+            parsed = {
+                explanation: `${concept} is an important concept in your notes. Review how it connects to other ideas in the graph.`,
+                quiz: [
+                    {
+                        question: `What does ${concept} relate to in your study material?`,
+                        options: [
+                            "Core topic",
+                            "Supporting idea",
+                            "Unrelated concept",
+                            "Example case"
+                        ],
+                        answer: "Core topic"
+                    }
+                ]
+            };
+        }
+
+        res.json(parsed);
+
+    } catch (err) {
+
+        console.error("Quiz route crashed:", err);
 
         res.json({
-            explanation,
-            quiz
-        })
-
-    } catch (err) {
-
-        console.error(err)
-        res.status(500).json({ error: "Quiz generation failed" })
-
+            explanation: "Explanation currently unavailable.",
+            quiz: [
+                {
+                    question: "Review this concept again.",
+                    options: ["Continue studying", "Skip", "Revise later", "Mark done"],
+                    answer: "Continue studying"
+                }
+            ]
+        });
     }
+});
 
-})
-
-
-// Save quiz result + update learning schedule
-router.post("/result", async (req, res) => {
-
-    try {
-
-        const { conceptId, correct } = req.body
-
-        await prisma.quizResult.create({
-            data: {
-                conceptId,
-                correct
-            }
-        })
-
-        const concept = await prisma.concept.findUnique({
-            where: { id: conceptId }
-        })
-
-        let interval = correct ? (concept.interval || 1) * 2 : 1
-
-        await prisma.concept.update({
-            where: { id: conceptId },
-            data: {
-                strength: correct ? { increment: 1 } : { decrement: 1 },
-                interval,
-                lastReviewed: new Date(),
-                nextReview: new Date(Date.now() + interval * 86400000)
-            }
-        })
-
-        res.json({ success: true })
-
-    } catch (err) {
-
-        console.error(err)
-        res.status(500).json({ error: "Saving result failed" })
-
-    }
-
-})
-
-export default router
+export default router;

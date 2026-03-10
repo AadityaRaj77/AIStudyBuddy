@@ -26,16 +26,14 @@ export default function RevisionPlan({ weakConcepts, noteId }: Props) {
       );
 
       setPlan(res.data.roadmap);
-    } catch (err) {
-      console.error("Roadmap generation failed", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 mt-6">
-      <h2 className="text-lg font-semibold text-purple-400 mb-4">
+    <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-lg mt-6">
+      <h2 className="text-lg font-semibold text-blue-500 mb-4">
         Personalized Study Plan
       </h2>
 
@@ -43,26 +41,19 @@ export default function RevisionPlan({ weakConcepts, noteId }: Props) {
         disabled={!noteId || weakConcepts.length === 0}
         onClick={generatePlan}
         className="
-          bg-purple-600
+          bg-blue-500
           text-white
           px-4
           py-2
-          rounded
+          rounded-xl
           font-semibold
-          hover:bg-purple-700
-          disabled:opacity-50
-          disabled:cursor-not-allowed
+          hover:bg-blue-600
           transition
+          disabled:opacity-50
         "
       >
         Generate Revision Plan
       </button>
-
-      {weakConcepts.length === 0 && (
-        <p className="text-sm text-slate-400 mt-3">
-          No weak concepts detected yet. Answer quizzes to generate a roadmap.
-        </p>
-      )}
 
       {loading && (
         <p className="text-sm text-slate-400 mt-4">
@@ -75,13 +66,13 @@ export default function RevisionPlan({ weakConcepts, noteId }: Props) {
           {plan.map((step) => (
             <div
               key={step.step}
-              className="p-3 border border-slate-700 rounded bg-slate-800"
+              className="p-4 border border-blue-100 rounded-xl bg-blue-50"
             >
-              <p className="font-semibold text-sm">
+              <p className="font-semibold text-sm text-blue-600">
                 Step {step.step}: {step.concept}
               </p>
 
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Review this concept and attempt the quiz again.
               </p>
             </div>

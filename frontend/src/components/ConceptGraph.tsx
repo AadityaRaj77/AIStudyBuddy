@@ -44,22 +44,23 @@ function layoutGraph(
     const isStrong = strongConcepts.includes(node.id);
     const isCurrent = node.id === currentStudyConcept;
 
-    let border = "1px solid #00f5ff";
-    let glow = "0 0 10px #00f5ff";
+    let border = "2px solid #3B82F6";
+    let glow = "0 4px 12px rgba(59,130,246,0.2)";
+    let bg = "#ffffff";
 
     if (isWeak) {
       border = "2px solid #ef4444";
-      glow = "0 0 15px #ef4444";
+      glow = "0 4px 12px rgba(239,68,68,0.25)";
     }
 
     if (isStrong) {
       border = "2px solid #22c55e";
-      glow = "0 0 15px #22c55e";
+      glow = "0 4px 12px rgba(34,197,94,0.25)";
     }
 
     if (isCurrent) {
-      border = "2px solid #a855f7";
-      glow = "0 0 20px #a855f7";
+      border = "2px solid #8b5cf6";
+      glow = "0 4px 16px rgba(139,92,246,0.35)";
     }
 
     return {
@@ -69,12 +70,14 @@ function layoutGraph(
         y: position.y - nodeHeight / 2,
       },
       style: {
-        background: "#020617",
-        color: "#ffffff",
+        background: bg,
+        color: "#1e293b",
         border,
         boxShadow: glow,
-        borderRadius: "10px",
+        borderRadius: "12px",
         padding: "10px",
+        fontWeight: "500",
+        transition: "all 0.2s ease",
       },
     };
   });
@@ -102,8 +105,8 @@ export default function ConceptGraph({
   );
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-900 p-4 shadow-lg">
-      <div className="h-125">
+    <div className="rounded-2xl border border-blue-100 bg-white shadow-xl p-6 transition-all">
+      <div className="h-105">
         <ReactFlow
           nodes={layouted.nodes}
           edges={layouted.edges}

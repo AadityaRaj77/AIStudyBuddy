@@ -19,48 +19,29 @@ function App() {
   const startStudySession = async () => {
     if (!noteId) return;
 
-    try {
-      setLoadingStudy(true);
+    setLoadingStudy(true);
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/study-session/${noteId}`,
-      );
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/study-session/${noteId}`,
+    );
 
-      const data = await res.json();
+    const data = await res.json();
 
-      setCurrentStudyConcept(data.nextConcept);
+    setCurrentStudyConcept(data.nextConcept);
+    setSelectedConcept(data.nextConcept);
 
-      // automatically open panel
-      setSelectedConcept(data.nextConcept);
-    } catch (err) {
-      console.error("Study session failed", err);
-    } finally {
-      setLoadingStudy(false);
-    }
+    setLoadingStudy(false);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-10">
-      {/* Title */}
-      <h1
-        className="
-        text-5xl
-        font-bold
-        text-center
-        mb-10
-        bg-linear-to-r
-        from-purple-400
-        via-pink-400
-        to-purple-400
-        bg-clip-text
-        text-transparent
-      "
-      >
-        NeuroMap
-      </h1>
+    <div className="min-h-screen bg-blue-50 text-slate-800 p-10">
+      {/* Logo + Brand */}
+      <div className="flex items-center justify-center gap-3 mb-10">
+        <img src="/mind-map.png" className="w-18 h-18" />
+        <h1 className="text-4xl font-bold text-blue-500">NeuroMap</h1>
+      </div>
 
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Upload */}
         <UploadPage
           setGraph={(g) => {
             setGraph(g);
@@ -72,7 +53,6 @@ function App() {
           setNoteId={setNoteId}
         />
 
-        {/* Study Session */}
         {graph && (
           <div className="flex justify-center">
             <button
@@ -81,12 +61,13 @@ function App() {
               className="
                 px-6
                 py-2
-                rounded-lg
+                rounded-xl
                 font-semibold
-                bg-purple-600
-                hover:bg-purple-700
-                disabled:opacity-50
+                bg-blue-500
+                text-white
+                hover:bg-blue-600
                 transition
+                disabled:opacity-50
               "
             >
               {loadingStudy ? "Starting..." : "Start Study Session"}
@@ -94,7 +75,6 @@ function App() {
           </div>
         )}
 
-        {/* Graph */}
         {graph && (
           <ConceptGraph
             graph={graph}
@@ -105,16 +85,16 @@ function App() {
           />
         )}
 
-        {/* Revision Plan */}
         {graph && <RevisionPlan weakConcepts={weakConcepts} noteId={noteId} />}
       </div>
 
-      {/* Concept Panel */}
       {selectedConcept && (
         <ConceptPanel
           concept={selectedConcept}
           setWeakConcepts={setWeakConcepts}
           setStrongConcepts={setStrongConcepts}
+          setSelectedConcept={setSelectedConcept}
+          noteId={noteId}
         />
       )}
     </div>

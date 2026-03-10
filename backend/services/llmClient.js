@@ -1,17 +1,30 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 
-const ai = new GoogleGenAI({});
+const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function callLLM(prompt) {
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt
+
+        const chatCompletion = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+                {
+                    role: "user",
+                    content: prompt,
+                },
+            ],
+            temperature: 0.2,
+            max_tokens: 800,
         });
-        return response.text;
-    }
-    catch (err) {
-        console.error("Gemini failed:", err);
+
+        const text = chatCompletion.choices[0]?.message?.content || "";
+
+        return text;
+
+    } catch (err) {
+        console.error("Groq failed:", err);
         return "";
     }
 }

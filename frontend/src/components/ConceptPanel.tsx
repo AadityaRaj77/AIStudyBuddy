@@ -16,12 +16,16 @@ interface Props {
   concept: string | null;
   setWeakConcepts: React.Dispatch<React.SetStateAction<string[]>>;
   setStrongConcepts: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelectedConcept: (concept: string | null) => void;
+  noteId: number | null;
 }
 
 export default function ConceptPanel({
   concept,
   setWeakConcepts,
   setStrongConcepts,
+  setSelectedConcept,
+  noteId,
 }: Props) {
   const [data, setData] = useState<ResponseData | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -33,18 +37,11 @@ export default function ConceptPanel({
     setSelectedOption(null);
 
     const fetchExplanation = async () => {
-      try {
-        const res = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/quiz`,
-          {
-            concept,
-          },
-        );
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/quiz`, {
+        concept,
+      });
 
-        setData(res.data);
-      } catch (err) {
-        console.error("Quiz fetch failed", err);
-      }
+      setData(res.data);
     };
 
     fetchExplanation();
@@ -53,22 +50,24 @@ export default function ConceptPanel({
   if (!concept) return null;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 bg-slate-900 border-l border-slate-700 p-6 overflow-y-auto">
-      <h2 className="text-xl font-bold text-purple-400 mb-4">{concept}</h2>
+    <div className="fixed right-0 top-0 h-full w-105 bg-white border-l border-blue-100 p-8 overflow-y-auto shadow-xl">
+      <h2 className="text-2xl font-bold text-blue-500 mb-6">{concept}</h2>
 
       {!data && (
-        <p className="text-sm text-slate-400">Generating explanation…</p>
+        <p className="text-sm text-slate-400 animate-pulse">
+          Generating explanation…
+        </p>
       )}
 
       {data && (
         <>
-          <p className="text-sm text-slate-300 mb-6 leading-relaxed">
+          <p className="text-sm text-slate-600 mb-8 leading-relaxed">
             {data.explanation}
           </p>
 
           {data.quiz.map((q, i) => (
-            <div key={i} className="mb-6">
-              <p className="font-semibold mb-3">{q.question}</p>
+            <div key={i} className="mb-8">
+              <p className="font-semibold mb-4">{q.question}</p>
 
               {q.options.map((o) => {
                 const isSelected = selectedOption === o;
@@ -78,7 +77,7 @@ export default function ConceptPanel({
                   <button
                     key={o}
                     disabled={selectedOption !== null}
-                    onClick={() => {
+                    onClick={async () => {
                       setSelectedOption(o);
 
                       if (isCorrect) {
@@ -90,24 +89,42 @@ export default function ConceptPanel({
                           prev.includes(concept) ? prev : [...prev, concept],
                         );
                       }
+
+                      // move to next concept automatically
+                      setTimeout(async () => {
+                        if (!noteId) return;
+
+                        const res = await fetch(
+                          `${import.meta.env.VITE_API_URL}/api/study-session/${noteId}`,
+                        );
+
+                        const data = await res.json();
+
+                        if (data.nextConcept) {
+                          setSelectedConcept(data.nextConcept);
+                        } else {
+                          setSelectedConcept(null);
+                        }
+                      }, 1200);
                     }}
                     className={`
                       block
                       w-full
                       text-left
                       p-3
-                      mb-2
-                      rounded
+                      mb-3
+                      rounded-xl
                       border
                       transition
+                      hover:scale-[1.02]
                       ${
                         selectedOption
                           ? isCorrect
-                            ? "border-green-500 bg-green-500/10"
+                            ? "border-green-400 bg-green-50"
                             : isSelected
-                              ? "border-red-500 bg-red-500/10"
-                              : "border-slate-700"
-                          : "border-slate-700 hover:bg-slate-800"
+                              ? "border-red-400 bg-red-50"
+                              : "border-slate-200"
+                          : "border-slate-200 hover:bg-blue-50"
                       }
                     `}
                   >
@@ -119,7 +136,7 @@ export default function ConceptPanel({
           ))}
 
           {selectedOption && (
-            <div className="text-sm text-purple-300">
+            <div className="text-sm text-blue-500 font-medium">
               Answer recorded. Continue exploring concepts.
             </div>
           )}

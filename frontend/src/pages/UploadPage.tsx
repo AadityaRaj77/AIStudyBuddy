@@ -23,8 +23,7 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
 
       setGraph(data.graph);
       setNoteId(Number(data.noteId));
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Failed to analyze notes. Please try again.");
     } finally {
       setLoading(false);
@@ -32,8 +31,8 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 shadow-lg">
-      <h2 className="text-purple-400 text-lg font-semibold mb-4">
+    <div className="rounded-2xl border border-blue-100 bg-white p-6 shadow-lg">
+      <h2 className="text-blue-500 text-lg font-semibold mb-4">
         Upload Study Notes
       </h2>
 
@@ -41,11 +40,9 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
         <input
           type="file"
           accept=".txt,.pdf,.doc,.docx"
-          className="text-sm text-slate-300"
+          className="text-sm"
           onChange={(e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              setFile(e.target.files[0]);
-            }
+            if (e.target.files) setFile(e.target.files[0]);
           }}
         />
 
@@ -55,14 +52,13 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
           className="
             px-5
             py-2
-            rounded-lg
+            rounded-xl
             font-semibold
-            bg-purple-600
+            bg-blue-500
             text-white
-            hover:bg-purple-700
-            disabled:opacity-50
-            disabled:cursor-not-allowed
+            hover:bg-blue-600
             transition
+            disabled:opacity-50
           "
         >
           {loading ? "Analyzing..." : "Analyze"}
@@ -70,18 +66,12 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
       </div>
 
       {file && (
-        <p className="text-xs text-slate-400 mt-3">
+        <p className="text-xs text-slate-500 mt-3">
           Selected file: {file.name}
         </p>
       )}
 
-      {error && <p className="text-sm text-red-400 mt-3">{error}</p>}
-
-      {loading && (
-        <p className="text-sm text-slate-400 mt-3">
-          Building concept graph using AI...
-        </p>
-      )}
+      {error && <p className="text-sm text-red-500 mt-3">{error}</p>}
     </div>
   );
 }
