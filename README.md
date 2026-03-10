@@ -90,7 +90,7 @@ NeuroMap solves this by converting notes into a visual knowledge map, allowing s
 
 ### AI / NLP
 
-- Gemini API (LLM)
+- Groq API (LLM)
 - Prompt-based concept extraction
 
 ### Document Parsing
@@ -155,7 +155,7 @@ React Frontend (Vercel)
 Express Backend API (Render)
 │
 ├── PDF Parsing (pdf2json)
-├── Concept Extraction (Gemini API)
+├── Concept Extraction (Groq API)
 ├── Knowledge Graph Construction
 │
 ▼
@@ -200,7 +200,7 @@ Create .env
 
 ```bash
 DATABASE_URL=your_postgres_connection_string
-GEMINI_API_KEY=your_api_key
+GROQ_API_KEY=your_api_key
 PORT=5000
 ```
 
