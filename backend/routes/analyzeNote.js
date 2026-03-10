@@ -31,10 +31,16 @@ router.post("/", upload.single("note"), async (req, res) => {
                     const text = pdfData.Pages
                         .map(page =>
                             page.Texts
-                                .map(t => decodeURIComponent(t.R[0].T))
+                                .map(t => {
+                                    try {
+                                        return decodeURIComponent(t.R[0].T)
+                                    } catch {
+                                        return t.R[0].T
+                                    }
+                                })
                                 .join(" ")
                         )
-                        .join("\n");
+                        .join("\n")
 
                     resolve(text);
 
