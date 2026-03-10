@@ -34,9 +34,12 @@ export default function ConceptPanel({
 
     const fetchExplanation = async () => {
       try {
-        const res = await axios.post("http://localhost:5000/api/quiz", {
-          concept,
-        });
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/quiz`,
+          {
+            concept,
+          },
+        );
 
         setData(res.data);
       } catch (err) {

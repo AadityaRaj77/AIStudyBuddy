@@ -22,7 +22,7 @@ export default function RevisionPlan({ weakConcepts, noteId }: Props) {
       setLoading(true);
 
       const res = await axios.get(
-        `http://localhost:5000/api/roadmap/${noteId}`,
+        `${import.meta.env.VITE_API_URL}/api/roadmap/${noteId}`,
       );
 
       setPlan(res.data.roadmap);

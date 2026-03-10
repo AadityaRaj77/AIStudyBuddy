@@ -23,7 +23,7 @@ function App() {
       setLoadingStudy(true);
 
       const res = await fetch(
-        `http://localhost:5000/api/study-session/${noteId}`,
+        `${import.meta.env.VITE_API_URL}/api/study-session/${noteId}`,
       );
 
       const data = await res.json();

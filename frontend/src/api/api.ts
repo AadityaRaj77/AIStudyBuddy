@@ -14,7 +14,7 @@ export const analyzeNote = async (
   formData.append("note", file);
 
   const response = await axios.post<AnalyzeResponse>(
-    "http://localhost:5000/api/analyze",
+    `${import.meta.env.VITE_API_URL}/api/analyze`,
     formData,
     {
       headers: {
