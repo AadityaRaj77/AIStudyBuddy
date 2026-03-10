@@ -11,9 +11,6 @@ interface Props {
   currentStudyConcept: string | null;
 }
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const nodeWidth = 180;
 const nodeHeight = 60;
 
@@ -23,10 +20,15 @@ function layoutGraph(
   strongConcepts: string[],
   currentStudyConcept: string | null,
 ) {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
   dagreGraph.setGraph({ rankdir: "LR" });
 
   graph.nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    dagreGraph.setNode(node.id, {
+      width: nodeWidth,
+      height: nodeHeight,
+    });
   });
 
   graph.edges.forEach((edge) => {
@@ -55,7 +57,6 @@ function layoutGraph(
       glow = "0 0 15px #22c55e";
     }
 
-    // Highlight current study concept (purple)
     if (isCurrent) {
       border = "2px solid #a855f7";
       glow = "0 0 20px #a855f7";
@@ -64,14 +65,16 @@ function layoutGraph(
     return {
       ...node,
       position: {
-        x: position.x,
-        y: position.y,
+        x: position.x - nodeWidth / 2,
+        y: position.y - nodeHeight / 2,
       },
       style: {
         background: "#020617",
         color: "#ffffff",
-        border: border,
+        border,
         boxShadow: glow,
+        borderRadius: "10px",
+        padding: "10px",
       },
     };
   });
@@ -106,7 +109,7 @@ export default function ConceptGraph({
           edges={layouted.edges}
           fitView
           onNodeClick={(_, node) => {
-            setSelectedConcept(node.data.label);
+            setSelectedConcept(node.data?.label ?? node.id);
           }}
         />
       </div>
