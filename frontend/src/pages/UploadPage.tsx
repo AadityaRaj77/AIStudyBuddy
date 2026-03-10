@@ -11,6 +11,7 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stage, setStage] = useState("");
 
   const handleUpload = async () => {
     if (!file) return;
@@ -18,10 +19,13 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
     try {
       setLoading(true);
       setError(null);
+      setStage("Parsing notes...");
 
       const data = await analyzeNote(file);
+      setStage("Extracting Concepts...");
 
       setGraph(data.graph);
+      setStage("Building knowledge graph...");
       setNoteId(Number(data.noteId));
     } catch {
       setError("Failed to analyze notes. Please try again.");
@@ -69,6 +73,9 @@ export default function UploadPage({ setGraph, setNoteId }: Props) {
         <p className="text-xs text-slate-500 mt-3">
           Selected file: {file.name}
         </p>
+      )}
+      {loading && (
+        <p className="text-sm text-blue-500 mt-3 animate-pulse">{stage}</p>
       )}
 
       {error && <p className="text-sm text-red-500 mt-3">{error}</p>}

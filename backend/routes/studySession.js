@@ -3,45 +3,51 @@ import { prisma } from "../db/prisma.js"
 
 const router = express.Router()
 
-// store study progress in memory (demo purpose)
-const studyProgress = {}
+const sessions = {}
 
 router.get("/:noteId", async (req, res) => {
 
     const noteId = Number(req.params.noteId)
 
     const concepts = await prisma.concept.findMany({
-        where: { noteId },
-        orderBy: {
-            strength: "asc"
-        }
+        where: { noteId }
     })
 
     if (concepts.length === 0) {
         return res.json({ message: "No concepts found" })
     }
 
-    // initialize session index
-    if (!studyProgress[noteId]) {
-        studyProgress[noteId] = 0
+    // prioritize weak concepts
+    const ordered = concepts.sort((a, b) => a.strength - b.strength)
+
+    if (!sessions[noteId]) {
+        sessions[noteId] = {
+            index: 0,
+            total: ordered.length
+        }
     }
 
-    const index = studyProgress[noteId]
+    const session = sessions[noteId]
 
-    // if finished all concepts
-    if (index >= concepts.length) {
-        studyProgress[noteId] = 0
-        return res.json({ message: "Study session complete" })
+    if (session.index >= ordered.length) {
+
+        sessions[noteId] = null
+
+        return res.json({
+            sessionComplete: true,
+            totalConcepts: ordered.length
+        })
     }
 
-    const nextConcept = concepts[index]
+    const next = ordered[session.index]
 
-    // move pointer forward
-    studyProgress[noteId]++
+    session.index++
 
     res.json({
-        nextConcept: nextConcept.name,
-        strength: nextConcept.strength
+        nextConcept: next.name,
+        strength: next.strength,
+        progress: session.index,
+        total: session.total
     })
 
 })

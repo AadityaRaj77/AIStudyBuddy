@@ -73,7 +73,8 @@ export default function RevisionPlan({ weakConcepts, noteId }: Props) {
               </p>
 
               <p className="text-xs text-slate-500">
-                Review this concept and attempt the quiz again.
+                Revisit explanation → explore related concepts → retry quiz to
+                strengthen understanding.
               </p>
             </div>
           ))}

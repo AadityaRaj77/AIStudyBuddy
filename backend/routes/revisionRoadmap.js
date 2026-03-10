@@ -11,34 +11,30 @@ router.get("/:noteId", async (req, res) => {
         where: { noteId }
     })
 
-    const relations = await prisma.relationship.findMany()
+    const weak = concepts.filter(c => c.strength < 0)
+    const medium = concepts.filter(c => c.strength >= 0 && c.strength < 2)
 
-    const roadmap = concepts.map(c => {
+    const roadmap = []
 
-        const connections =
-            relations.filter(
-                r => r.fromId === c.id || r.toId === c.id
-            ).length
-
-        const priority = connections - (c.strength || 0)
-
-        return {
+    weak.forEach((c, i) => {
+        roadmap.push({
+            step: roadmap.length + 1,
             concept: c.name,
-            strength: c.strength,
-            connections,
-            priority
-        }
-
+            action: "Review explanation and retry quiz"
+        })
     })
 
-    roadmap.sort((a, b) => b.priority - a.priority)
+    medium.forEach((c, i) => {
+        roadmap.push({
+            step: roadmap.length + 1,
+            concept: c.name,
+            action: "Practice quiz again to strengthen memory"
+        })
+    })
 
-    const steps = roadmap.map((r, i) => ({
-        step: i + 1,
-        concept: r.concept
-    }))
-
-    res.json({ roadmap: steps })
+    res.json({
+        roadmap
+    })
 
 })
 

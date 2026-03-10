@@ -18,6 +18,8 @@ interface Props {
   setStrongConcepts: React.Dispatch<React.SetStateAction<string[]>>;
   setSelectedConcept: (concept: string | null) => void;
   noteId: number | null;
+  progress?: number;
+  total?: number;
 }
 
 export default function ConceptPanel({
@@ -26,6 +28,8 @@ export default function ConceptPanel({
   setStrongConcepts,
   setSelectedConcept,
   noteId,
+  progress,
+  total,
 }: Props) {
   const [data, setData] = useState<ResponseData | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -37,11 +41,16 @@ export default function ConceptPanel({
     setSelectedOption(null);
 
     const fetchExplanation = async () => {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/quiz`, {
-        concept,
-      });
+      try {
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/quiz`,
+          { concept },
+        );
 
-      setData(res.data);
+        setData(res.data);
+      } catch (err) {
+        console.error("Quiz fetch failed", err);
+      }
     };
 
     fetchExplanation();
@@ -52,6 +61,22 @@ export default function ConceptPanel({
   return (
     <div className="fixed right-0 top-0 h-full w-105 bg-white border-l border-blue-100 p-8 overflow-y-auto shadow-xl">
       <h2 className="text-2xl font-bold text-blue-500 mb-6">{concept}</h2>
+
+      {/* Progress */}
+      {progress && total && (
+        <div className="mb-4">
+          <div className="text-xs text-slate-500 mb-1">
+            Study Progress {progress} / {total}
+          </div>
+
+          <div className="w-full bg-blue-100 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full transition-all"
+              style={{ width: `${(progress / total) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {!data && (
         <p className="text-sm text-slate-400 animate-pulse">
@@ -90,20 +115,23 @@ export default function ConceptPanel({
                         );
                       }
 
-                      // move to next concept automatically
                       setTimeout(async () => {
                         if (!noteId) return;
 
-                        const res = await fetch(
-                          `${import.meta.env.VITE_API_URL}/api/study-session/${noteId}`,
-                        );
+                        try {
+                          const res = await fetch(
+                            `${import.meta.env.VITE_API_URL}/api/study-session/${noteId}`,
+                          );
 
-                        const data = await res.json();
+                          const data = await res.json();
 
-                        if (data.nextConcept) {
-                          setSelectedConcept(data.nextConcept);
-                        } else {
-                          setSelectedConcept(null);
+                          if (data.nextConcept) {
+                            setSelectedConcept(data.nextConcept);
+                          } else {
+                            setSelectedConcept(null);
+                          }
+                        } catch (err) {
+                          console.error("Next concept failed", err);
                         }
                       }, 1200);
                     }}
@@ -137,7 +165,7 @@ export default function ConceptPanel({
 
           {selectedOption && (
             <div className="text-sm text-blue-500 font-medium">
-              Answer recorded. Continue exploring concepts.
+              Answer recorded. Moving to next concept...
             </div>
           )}
         </>
