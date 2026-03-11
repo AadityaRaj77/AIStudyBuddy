@@ -1,4 +1,4 @@
-# NeuroMap – AI Study Graph Builder
+# NeuroMap – AI Knowledge Graph Builder for Personalized Learning
 
 ### Microsoft AI Unlocked
 
@@ -44,6 +44,14 @@ NeuroMap helps students understand complex material faster by:
 6. Personalized Revision Plan
 
 - Generates a roadmap based on weak concepts.
+
+7. Personalized Revision Roadmap
+
+- recommend study order, which topics require review
+
+8. Learning Progress Track
+
+- The system tracks concept mastery and displays overall learning progress to the user.
 
 ## Why It Is Useful
 
@@ -92,10 +100,16 @@ NeuroMap solves this by converting notes into a visual knowledge map, allowing s
 
 - Groq API (LLM)
 - Prompt-based concept extraction
+- Retrieval Augmented Generation (RAG)
 
 ### Document Parsing
 
 - pdf2json (PDF text extraction)
+
+### Performance Optimization
+
+- Azure Blob Storage - file storage for uploaded notes
+- Azure Redis Cache - caching AI-generated quiz and explaination responses
 
 ### Deployment
 
@@ -108,37 +122,39 @@ NeuroMap solves this by converting notes into a visual knowledge map, allowing s
 AIStudyBuddy
 │
 ├── backend
-│ ├── routes
-│ │ ├── analyzeNote.js
-│ │ ├── generateQuiz.js
-│ │ ├── revisionRoadmap.js
-│ │ └── studySession.js
-│ │
-│ ├── services
-│ │ ├── conceptExtractor.js
-│ │ ├── llmClient.js
-│ │ ├── retrieval.js
-│ │ └── chunker.js
-│ │
-│ ├── db
-│ │ └── prisma.js
-│ │
-│ └── server.js
+│   ├── routes
+│   │   ├── analyzeNote.js
+│   │   ├── generateQuiz.js
+│   │   ├── revisionRoadmap.js
+│   │   └── studySession.js
+│   │
+│   ├── services
+│   │   ├── conceptExtractor.js
+│   │   ├── llmClient.js
+│   │   ├── retrieval.js
+│   │   ├── chunker.js
+│   │   ├── blobStorage.js
+│   │   └── cache.js
+│   │
+│   ├── db
+│   │   └── prisma.js
+│   │
+│   └── server.js
 │
 ├── frontend
-│ ├── src
-│ │ ├── components
-│ │ │ ├── ConceptGraph.tsx
-│ │ │ ├── ConceptPanel.tsx
-│ │ │ └── RevisionPlan.tsx
-│ │ │
-│ │ ├── pages
-│ │ │ └── UploadPage.tsx
-│ │ │
-│ │ └── App.tsx
-│ │
-│ └── api
-│ └── api.ts
+│   ├── src
+│   │   ├── components
+│   │   │   ├── ConceptGraph.tsx
+│   │   │   ├── ConceptPanel.tsx
+│   │   │   └── RevisionPlan.tsx
+│   │   │
+│   │   ├── pages
+│   │   │   └── UploadPage.tsx
+│   │   │
+│   │   └── App.tsx
+│   │
+│   └── api
+│       └── api.ts
 │
 └── README.md
 ```
@@ -154,9 +170,21 @@ React Frontend (Vercel)
 ▼
 Express Backend API (Render)
 │
-├── PDF Parsing (pdf2json)
-├── Concept Extraction (Groq API)
-├── Knowledge Graph Construction
+├── Document Processing
+│     └─ PDF Parsing (pdf2json)
+│
+├── AI Layer
+│     ├─ Concept Extraction
+│     └─ Explanation + Quiz Generation
+│
+├── Retrieval Layer
+│     └─ Relevant Note Chunk Retrieval
+│
+├── Cache Layer
+│     └─ Redis (Azure Cache for Redis)
+│
+├── Storage Layer
+│     └─ Azure Blob Storage
 │
 ▼
 PostgreSQL Database
@@ -167,7 +195,7 @@ PostgreSQL Database
 └── Quiz Results
 │
 ▼
-Graph returned to frontend
+Knowledge Graph returned to frontend
 │
 ▼
 ReactFlow Visualization
@@ -199,8 +227,14 @@ npm install
 Create .env
 
 ```bash
-DATABASE_URL=your_postgres_connection_string
-GROQ_API_KEY=your_api_key
+DATABASE_URL=your_postgres_connection
+GROQ_API_KEY=your_groq_api_key
+
+AZURE_STORAGE_CONNECTION_STRING=your_blob_connection
+AZURE_STORAGE_CONTAINER=notes
+
+REDIS_URL=your_redis_connection
+
 PORT=5000
 ```
 
