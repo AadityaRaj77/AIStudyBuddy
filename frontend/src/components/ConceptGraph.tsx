@@ -52,25 +52,23 @@ function layoutGraph(
     let border = "2px solid #3B82F6";
     let glow = "0 4px 12px rgba(59,130,246,0.2)";
     let bg = "#ffffff";
+    let opacity = 1;
 
     if (isWeak) {
       border = "2px solid #ef4444";
-      glow = "0 4px 12px rgba(239,68,68,0.25)";
     }
 
     if (isStrong) {
       border = "2px solid #22c55e";
-      glow = "0 4px 12px rgba(34,197,94,0.25)";
     }
 
     if (isCurrent) {
       border = "2px solid #8b5cf6";
-      glow = "0 4px 16px rgba(139,92,246,0.35)";
+      glow = "0 6px 18px rgba(139,92,246,0.35)";
     }
 
-    if (matchesSearch) {
-      bg = "#dbeafe";
-      glow = "0 0 0 3px rgba(59,130,246,0.35)";
+    if (search && !matchesSearch) {
+      opacity = 0.4;
     }
 
     return {
@@ -87,6 +85,7 @@ function layoutGraph(
         borderRadius: "12px",
         padding: "10px",
         fontWeight: "500",
+        opacity,
         transition: "all 0.2s ease",
       },
     };
@@ -119,7 +118,6 @@ export default function ConceptGraph({
 
   return (
     <div className="rounded-2xl border border-blue-100 bg-white shadow-xl p-6">
-      {/* Legend */}
       <div className="flex gap-6 text-xs mb-4 text-slate-600">
         <div className="flex items-center gap-2">
           <span className="w-3 h-3 rounded-full bg-red-400"></span>
@@ -137,8 +135,7 @@ export default function ConceptGraph({
         </div>
       </div>
 
-      {/* Search */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4">
         <input
           type="text"
           placeholder="Search concept..."
@@ -159,7 +156,6 @@ export default function ConceptGraph({
         />
       </div>
 
-      {/* Graph */}
       <div className="h-105">
         <ReactFlow
           nodes={layouted.nodes}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UploadPage from "./pages/UploadPage";
 import ConceptGraph from "./components/ConceptGraph";
 import ConceptPanel from "./components/ConceptPanel";
@@ -15,6 +15,27 @@ function App() {
   );
   const [noteId, setNoteId] = useState<number | null>(null);
   const [loadingStudy, setLoadingStudy] = useState(false);
+
+  /* Load saved learning state */
+  useEffect(() => {
+    const weak = localStorage.getItem("weakConcepts");
+    const strong = localStorage.getItem("strongConcepts");
+
+    if (weak) setWeakConcepts(JSON.parse(weak));
+    if (strong) setStrongConcepts(JSON.parse(strong));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("weakConcepts", JSON.stringify(weakConcepts));
+  }, [weakConcepts]);
+
+  useEffect(() => {
+    localStorage.setItem("strongConcepts", JSON.stringify(strongConcepts));
+  }, [strongConcepts]);
+
+  /* Learning progress */
+  const mastery =
+    strongConcepts.length / (strongConcepts.length + weakConcepts.length || 1);
 
   const startStudySession = async () => {
     if (!noteId) return;
@@ -35,10 +56,17 @@ function App() {
 
   return (
     <div className="min-h-screen bg-blue-50 text-slate-800 p-10">
-      {/* Logo + Brand */}
-      <div className="flex items-center justify-center gap-3 mb-10">
-        <img src="/mind-map.png" className="w-18 h-18" />
+      {/* Logo */}
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <img src="/mind-map.png" className="w-16 h-16" />
         <h1 className="text-4xl font-bold text-blue-500">NeuroMap</h1>
+      </div>
+
+      {/* Learning progress */}
+      <div className="flex justify-center mb-6">
+        <div className="bg-white px-6 py-3 rounded-xl shadow text-sm">
+          Learning Progress: {(mastery * 100).toFixed(0)}%
+        </div>
       </div>
 
       <div className="max-w-5xl mx-auto space-y-6">

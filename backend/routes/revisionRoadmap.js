@@ -16,25 +16,23 @@ router.get("/:noteId", async (req, res) => {
 
     const roadmap = []
 
-    weak.forEach((c, i) => {
+    weak.forEach(c => {
         roadmap.push({
             step: roadmap.length + 1,
             concept: c.name,
-            action: "Review explanation and retry quiz"
+            action: "Re-read explanation and retry quiz"
         })
     })
 
-    medium.forEach((c, i) => {
+    medium.forEach(c => {
         roadmap.push({
             step: roadmap.length + 1,
             concept: c.name,
-            action: "Practice quiz again to strengthen memory"
+            action: "Practice quiz again to reinforce memory"
         })
     })
 
-    res.json({
-        roadmap
-    })
+    res.json({ roadmap })
 
 })
 

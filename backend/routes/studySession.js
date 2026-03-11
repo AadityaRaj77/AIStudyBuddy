@@ -17,14 +17,14 @@ router.get("/:noteId", async (req, res) => {
         return res.json({ message: "No concepts found" })
     }
 
-    // prioritize weak concepts
-    const ordered = concepts.sort((a, b) => a.strength - b.strength)
+    const weak = concepts.filter(c => c.strength < 0)
+    const medium = concepts.filter(c => c.strength >= 0 && c.strength < 2)
+    const strong = concepts.filter(c => c.strength >= 2)
+
+    const ordered = [...weak, ...medium, ...strong]
 
     if (!sessions[noteId]) {
-        sessions[noteId] = {
-            index: 0,
-            total: ordered.length
-        }
+        sessions[noteId] = { index: 0 }
     }
 
     const session = sessions[noteId]
@@ -35,19 +35,19 @@ router.get("/:noteId", async (req, res) => {
 
         return res.json({
             sessionComplete: true,
-            totalConcepts: ordered.length
+            total: ordered.length
         })
     }
 
-    const next = ordered[session.index]
+    const concept = ordered[session.index]
 
     session.index++
 
     res.json({
-        nextConcept: next.name,
-        strength: next.strength,
+        nextConcept: concept.name,
+        strength: concept.strength,
         progress: session.index,
-        total: session.total
+        total: ordered.length
     })
 
 })
